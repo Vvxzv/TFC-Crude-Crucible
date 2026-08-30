@@ -1,13 +1,13 @@
 package net.vvxzv.tfccc.common.block.entity;
 
+import net.dries007.tfc.common.blockentities.IHeatable;
 import net.dries007.tfc.common.blockentities.TFCBlockEntity;
-import net.dries007.tfc.common.capabilities.SidedHandler;
-import net.dries007.tfc.common.capabilities.heat.HeatCapability;
-import net.dries007.tfc.common.capabilities.heat.IHeat;
-import net.dries007.tfc.common.capabilities.heat.IHeatBlock;
+import net.dries007.tfc.common.component.heat.HeatCapability;
+import net.dries007.tfc.common.component.heat.IHeat;
+import net.dries007.tfc.common.component.heat.IHeatConsumer;
 import net.dries007.tfc.util.calendar.ICalendarTickable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -15,19 +15,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import net.vvxzv.tfccc.Config;
 import net.vvxzv.tfccc.common.registry.BlockEntities;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatBlock, ICalendarTickable {
+public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatable, IHeatConsumer, ICalendarTickable {
     private ItemStack stack;
     private float temperature;
     private long lastCalendarUpdateTick;
     private int targetTemperatureStabilityTicks;
-    private final SidedHandler.Noop<IHeatBlock> sidedHeat;
 
     public CrudeCrucibleBlockEntity(BlockPos pos, BlockState state) {
         this(BlockEntities.CRUDE_CRUCIBLE.get(), pos, state);
@@ -38,7 +34,6 @@ public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatBlo
         this.stack = ItemStack.EMPTY;
         this.temperature = 0;
         this.lastCalendarUpdateTick = Integer.MIN_VALUE;
-        this.sidedHeat = new SidedHandler.Noop<>(this);
     }
 
     @SuppressWarnings("unused")
@@ -62,21 +57,23 @@ public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatBlo
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag nbt) {
-        super.loadAdditional(nbt);
-        this.stack = ItemStack.of(nbt.getCompound("item"));
-        this.temperature = nbt.getFloat("temperature");
-        this.lastCalendarUpdateTick = nbt.getLong("lastCalendarUpdateTick");
-        this.targetTemperatureStabilityTicks = nbt.getInt("targetTemperatureStabilityTicks");
+    public void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
+        super.saveAdditional(tag, provider);
+        if (!this.stack.isEmpty()) {
+            tag.put("item", this.stack.save(provider));
+        }
+        tag.putFloat("temperature", this.temperature);
+        tag.putLong("lastCalendarUpdateTick", this.lastCalendarUpdateTick);
+        tag.putInt("targetTemperatureStabilityTicks", this.targetTemperatureStabilityTicks);
     }
 
     @Override
-    public void saveAdditional(@NotNull CompoundTag nbt) {
-        super.saveAdditional(nbt);
-        nbt.put("item", this.stack.save(new CompoundTag()));
-        nbt.putFloat("temperature", this.temperature);
-        nbt.putLong("lastCalendarUpdateTick", this.lastCalendarUpdateTick);
-        nbt.putInt("targetTemperatureStabilityTicks", this.targetTemperatureStabilityTicks);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
+        super.loadAdditional(tag, provider);
+        this.stack = ItemStack.parseOptional(provider, tag.getCompound("item"));
+        this.temperature = tag.getFloat("temperature");
+        this.lastCalendarUpdateTick = tag.getLong("lastCalendarUpdateTick");
+        this.targetTemperatureStabilityTicks = tag.getInt("targetTemperatureStabilityTicks");
     }
 
     public static boolean isAllowItem(ItemStack stack) {
@@ -131,10 +128,5 @@ public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatBlo
     @Override
     public void setLastCalendarUpdateTick(long ticks) {
         this.lastCalendarUpdateTick = ticks;
-    }
-
-    @Override
-    public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        return cap == HeatCapability.BLOCK_CAPABILITY ? this.sidedHeat.getSidedHandler(side).cast() : super.getCapability(cap, side);
     }
 }

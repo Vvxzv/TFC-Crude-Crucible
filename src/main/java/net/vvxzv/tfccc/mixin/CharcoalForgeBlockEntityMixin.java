@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CharcoalForgeBlockEntity.class)
 public class CharcoalForgeBlockEntityMixin {
 
-    @Inject(method = "isItemValid", at = @At(value = "RETURN", ordinal = 1), cancellable = true, remap = false)
+    @Inject(method = "isItemValid", at = @At(value = "RETURN", ordinal = 1), cancellable = true)
     private void isItemValid(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         boolean returnValue = cir.getReturnValue();
         cir.setReturnValue(returnValue && !CrudeCrucibleBlockEntity.isAllowItem(stack));

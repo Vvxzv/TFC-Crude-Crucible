@@ -1,26 +1,35 @@
 package net.vvxzv.tfccc;
 
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.dries007.tfc.common.capabilities.BlockCapabilities;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.vvxzv.tfccc.common.registry.BlockEntities;
 import net.vvxzv.tfccc.common.registry.Blocks;
 
 @Mod(TFCCrudeCrucible.MODID)
 public class TFCCrudeCrucible {
-
     public static final String MODID = "tfc_crude_crucible";
 
-    @SuppressWarnings("removal")
-    public TFCCrudeCrucible() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public TFCCrudeCrucible(IEventBus modEventBus, ModContainer modContainer) {
         Blocks.BLOCKS.register(modEventBus);
         BlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
 
-        ForgeEventHandler.init();
+        modEventBus.addListener(this::registerCapabilities);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        NeoForgeEventHandler.init();
+
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+
+    public void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+                BlockCapabilities.HEAT,
+                BlockEntities.CRUDE_CRUCIBLE.get(),
+                (blockEntity, direction) -> blockEntity
+        );
     }
 }

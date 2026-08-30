@@ -11,24 +11,24 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.vvxzv.tfccc.common.block.entity.CrudeCrucibleBlockEntity;
 import net.vvxzv.tfccc.common.registry.Blocks;
 
-public class ForgeEventHandler {
+public class NeoForgeEventHandler {
 
     public static void init() {
-        IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener(ForgeEventHandler::placeCrudeCrucible);
+        IEventBus bus = NeoForge.EVENT_BUS;
+        bus.addListener(NeoForgeEventHandler::placeCrudeCrucible);
     }
 
     public static void placeCrudeCrucible(PlayerInteractEvent.RightClickBlock event) {
         Level level = event.getLevel();
         Player player = event.getEntity();
 
-        if (player == null || !player.isShiftKeyDown()) {
+        if (!player.isShiftKeyDown()) {
             return;
         }
 

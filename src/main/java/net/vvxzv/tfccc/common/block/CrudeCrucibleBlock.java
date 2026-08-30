@@ -9,7 +9,7 @@ import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -41,12 +41,11 @@ public class CrudeCrucibleBlock extends ExtendedBlock implements EntityBlockExte
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
+    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult result) {
         if(hand != InteractionHand.MAIN_HAND) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        ItemStack stack = player.getMainHandItem();
         if(level.getBlockEntity(pos) instanceof CrudeCrucibleBlockEntity crudeCrucible) {
             ItemStack vessel = crudeCrucible.getStack();
             if(stack.isEmpty()) {
@@ -58,10 +57,10 @@ public class CrudeCrucibleBlock extends ExtendedBlock implements EntityBlockExte
             }
             crudeCrucible.setStack(ItemStack.EMPTY);
             level.removeBlock(pos, true);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
 
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
@@ -97,7 +96,7 @@ public class CrudeCrucibleBlock extends ExtendedBlock implements EntityBlockExte
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public @NotNull ItemStack getCloneItemStack(@NotNull BlockState state, @NotNull HitResult target, LevelReader level, @NotNull BlockPos pos, @NotNull Player player) {
         if(level.getBlockEntity(pos) instanceof CrudeCrucibleBlockEntity crudeCrucible) {
             return crudeCrucible.getStack().copy();
         }
