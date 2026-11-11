@@ -1,0 +1,11 @@
+{
+  "category": "tfc:getting_started",
+  "icon": "tfc:ceramic/vessel",
+  "name": "簡陋坩堝",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "通過手持$(thing)小缸$()$(6)潜行+右鍵$()放置在$(thing)木炭爐$()上方，可以獲得很大程度上的加熱速度。"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "category": "tfc:getting_started",
+  "icon": "tfc:ceramic/vessel",
+  "name": "Crude Crucible",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "By holding $(thing)Vessel $()$(6)Shift + Right-Click $()and placing it above $(thing)Charcoal Forge, $()a high heating speed can be achieved."
+    }
+  ]
+}
