@@ -41,7 +41,7 @@ public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatabl
         crudeCrucible.checkForCalendarUpdate();
 
         if (crudeCrucible.targetTemperatureStabilityTicks > 0) {
-            --crudeCrucible.targetTemperatureStabilityTicks;
+            crudeCrucible.targetTemperatureStabilityTicks--;
         }
 
         if (crudeCrucible.temperature > 0.0F && crudeCrucible.targetTemperatureStabilityTicks == 0) {
@@ -50,8 +50,7 @@ public class CrudeCrucibleBlockEntity extends TFCBlockEntity implements IHeatabl
 
         IHeat heat = HeatCapability.get(crudeCrucible.getStack());
         if(heat != null) {
-            float modifier = 3.0f + (crudeCrucible.temperature - heat.getTemperature()) * (float) Config.temperatureDifferenceGrowthRate;
-            HeatCapability.addTemp(heat, crudeCrucible.temperature, modifier);
+            HeatCapability.addTemp(heat, crudeCrucible.temperature, 6);
             crudeCrucible.markForSync();
         }
     }
